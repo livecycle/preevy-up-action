@@ -1,0 +1,12 @@
+{
+  "name": "@preevy/gh-action",
+  "version": "0.0.0",
+  "description": "A GitHub action to run the Preevy CLI",
+  "main": "lib/main.js",
+  "repository": "https://github.com/livecycle/gh-action-preevy.git",
+  "author": "Livecycle",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@actions/core": "^1.10.0"
+  }
+}
