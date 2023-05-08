@@ -1,16 +1,16 @@
-name: "Preevy CLI"
-description: "Runs the Preevy CLI"
+name: "Preevy Up"
+description: "Runs the Preevy `up` command"
 author: "Livecycle"
 inputs:
   profile-url:
     required: true
     description: "The Preevy profile URL"
-  command:
-    required: true
-    description: "The Preevy command to run."
   args:
     required: false
-    description: "Additional args to provide to the preevy CLI."
+    description: "Additional args to provide to the `up` command."
+  docker-compose-yaml-path:
+    required: false
+    description: "The path to the docker compose file. Uses current working directory if not provided."
 outputs:
   preview-environments-urls:
     description: "The generated URLs of the preview environments create by Preevy"
@@ -31,11 +31,12 @@ runs:
       shell: bash
       id: run_preevy
       run: |
-        preevy ${{ inputs.command }} ${{ inputs.args }}
+        compose-file-path=${{ inputs.docker-compose-yaml-path }}
+        preevy up ${compose-file-path:+-f ${compose-file-path}} ${{ inputs.args }}
         cat << EOF > urls.txt
         | Service | Port | URL |
         |---------|------|-----|
-        $(preevy urls --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
+        $(preevy urls ${compose-file-path:+-f ${compose-file-path}} --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
         EOF
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "urls_table<<$EOF" >> $GITHUB_ENV
