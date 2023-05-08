@@ -38,4 +38,7 @@ runs:
         |---------|------|-----|
         $(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
         EOF
-        echo "urls_table=$(cat urls.txt)" >> "$GITHUB_OUTPUT"
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "urls_table<<$EOF" >> $GITHUB_OUTPUT
+        cat urls.txt >> $GITHUB_OUTPUT
+        echo "$EOF" >> $GITHUB_OUTPUT
