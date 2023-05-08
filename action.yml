@@ -35,4 +35,4 @@ runs:
     - name: Run Preevy
       shell: bash
       id: run_preevy
-      run: ./up.sh
+      run: up.sh
