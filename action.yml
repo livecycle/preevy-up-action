@@ -38,4 +38,4 @@ runs:
         |---------|------|-----|
         $(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
         EOF
-        echo "urls_table=$(cat urls.txt) >> "$GITHUB_OUTPUT"
+        echo "urls_table=$(cat urls.txt)" >> "$GITHUB_OUTPUT"
