@@ -31,12 +31,12 @@ runs:
       shell: bash
       id: run_preevy
       run: |
-        compose-file-path=${{ inputs.docker-compose-yaml-path }}
-        preevy up ${compose-file-path:+-f ${compose-file-path}} ${{ inputs.args }}
+        compose_file_path=${{ inputs.docker-compose-yaml-path }}
+        preevy up ${compose_file_path:+-f ${compose_file_path}} ${{ inputs.args }}
         cat << EOF > urls.txt
         | Service | Port | URL |
         |---------|------|-----|
-        $(preevy urls ${compose-file-path:+-f ${compose-file-path}} --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
+        $(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json | jq -r '.[] | {service, port, url} | join(" | ") | "| " + . + " |" ')
         EOF
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "urls_table<<$EOF" >> $GITHUB_ENV
