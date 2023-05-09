@@ -1,6 +1,9 @@
 name: "Preevy Up"
 description: "Runs the Preevy `up` command"
 author: "Livecycle"
+branding:
+  icon: box
+  color: blue
 inputs:
   profile-url:
     required: true
