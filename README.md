@@ -45,7 +45,7 @@ The generated preview environment urls, formatted in JSON.
 ## Example usage
 
 ```yaml
-name: Deploy Preevy environment - with new action
+name: Deploy Preevy environment
 on:
   pull_request:
     types:
