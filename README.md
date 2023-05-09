@@ -64,7 +64,7 @@ jobs:
           role-to-assume: arn:aws:iam::12345678:role/my-role
           aws-region: eu-west-1
       - uses: actions/checkout@v3
-      - uses: livecycle/preevy-up@v0.0.3-alpha
+      - uses: livecycle/preevy-up@latest
         id: preevy
         with:
           profile-url: "s3://preevy-12345678-my-profile?region=eu-west-1"
