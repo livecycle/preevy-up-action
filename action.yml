@@ -40,13 +40,13 @@ runs:
       id: run_preevy
       run: |
         # Convert the docker-compose-yaml-path input to an env var
-        compose_file_path=${{ inputs.docker-compose-yaml-path }}
+        compose_file_path="${{ inputs.docker-compose-yaml-path }}"
 
         # Run the up command
         preevy up ${compose_file_path:+-f ${compose_file_path}} ${{ inputs.args }}
 
         # Fetch the generated preevy urls
-        urls_json=$(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json)
+        urls_json="$(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json)"
 
         # Format urls into a markdown table and store them in urls.txt
         cat << EOF > urls.txt
@@ -56,7 +56,7 @@ runs:
         EOF
 
         # Create a delimiter as detailed here: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        EOF="$(dd if=/dev/urandom bs=15 count=1 status=none | base64)"
 
         # Create the urls-markdown output
         echo "urls-markdown<<$EOF" >> $GITHUB_OUTPUT
