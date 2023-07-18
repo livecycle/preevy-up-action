@@ -68,7 +68,7 @@ jobs:
         id: preevy
         with:
           profile-url: "s3://preevy-12345678-my-profile?region=eu-west-1"
-          docker-compose-yaml-path: "-f ./docker/docker-compose.yaml"
+          docker-compose-yaml-paths: [./docker/docker-compose.yaml]
       - uses: mshick/add-pr-comment@v2
         with:
           message: ${{ steps.preevy.outputs.urls-markdown }} 
