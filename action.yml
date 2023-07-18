@@ -40,19 +40,20 @@ runs:
       id: run_preevy
       run: |
         # Convert the docker-compose-yaml-paths input to an env var
-        paths=${{ inputs.docker-compose-yaml-paths }}
-
+        file_paths=${{ inputs.docker-compose-yaml-paths }}
+        echo "Docker file paths ${file_paths}"
         # Initialize the joined preevy paths string
         joined_paths=""
 
         # Loop through the array and build the joined_paths string
-        for path in "${paths[@]}"; do
+        for path in "${file_paths[@]}"; do
             if [[ -n $path ]]; then
                 # Add -f and path to the joined_paths string
                 joined_paths+="-f $path "
             fi
         done
-
+        
+        echo "Running Preevy with files: ${joined_paths}"
 
         # Run the up command
         preevy up ${joined_paths} ${{ inputs.args }}
