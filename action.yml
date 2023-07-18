@@ -40,7 +40,7 @@ runs:
       id: run_preevy
       run: |
         # Convert the docker-compose-yaml-paths input to an env var
-        file_paths=${{ inputs.docker-compose-yaml-paths }}
+        IFS=',' read -ra file_paths <<< ${{ inputs.docker-compose-yaml-paths }}
         echo "Docker file paths ${file_paths}"
         # Initialize the joined preevy paths string
         joined_paths=""
