@@ -11,9 +11,9 @@ inputs:
   args:
     required: false
     description: "Additional args to provide to the `up` command."
-  docker-compose-yaml-path:
+  docker-compose-yaml-paths:
     required: false
-    description: "The path to the docker compose file. Uses current working directory if not provided."
+    description: "Array of comma separated paths to docker compose files. Uses current working directory if not provided."
 outputs:
   urls-markdown:
     description: "The generated URLs of the preview environments create by Preevy, formatted as a markdown table"
@@ -40,13 +40,14 @@ runs:
       id: run_preevy
       run: |
         # Convert the docker-compose-yaml-path input to an env var
-        compose_file_path="${{ inputs.docker-compose-yaml-path }}"
+        compose_file_path=${{ join(inputs.docker-compose-yaml-paths, '-f ') }}
+        compose_file_path_or_default=${compose_file_path:+-f ${compose_file_path}}
 
         # Run the up command
-        preevy up ${compose_file_path:+-f ${compose_file_path}} ${{ inputs.args }}
+        preevy up ${compose_file_path_or_default} ${{ inputs.args }}
 
         # Fetch the generated preevy urls
-        urls_json="$(preevy urls ${compose_file_path:+-f ${compose_file_path}} --json)"
+        urls_json="$(preevy urls ${compose_file_path_or_default} --json)"
 
         # Format urls into a markdown table and store them in urls.txt
         cat << EOF > urls.txt
