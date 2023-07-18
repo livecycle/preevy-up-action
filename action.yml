@@ -39,15 +39,26 @@ runs:
       shell: bash
       id: run_preevy
       run: |
-        # Convert the docker-compose-yaml-path input to an env var
-        compose_file_path=${{ join(inputs.docker-compose-yaml-paths, '-f ') }}
-        compose_file_path_or_default=${compose_file_path:+-f ${compose_file_path}}
+        # Convert the docker-compose-yaml-paths input to an env var
+        paths=${{ inputs.docker-compose-yaml-paths }}
+
+        # Initialize the joined preevy paths string
+        joined_paths=""
+
+        # Loop through the array and build the joined_paths string
+        for path in "${paths[@]}"; do
+            if [[ -n $path ]]; then
+                # Add -f and path to the joined_paths string
+                joined_paths+="-f $path "
+            fi
+        done
+
 
         # Run the up command
-        preevy up ${compose_file_path_or_default} ${{ inputs.args }}
+        preevy up ${joined_paths} ${{ inputs.args }}
 
         # Fetch the generated preevy urls
-        urls_json="$(preevy urls ${compose_file_path_or_default} --json)"
+        urls_json="$(preevy urls ${joined_paths} --json)"
 
         # Format urls into a markdown table and store them in urls.txt
         cat << EOF > urls.txt
