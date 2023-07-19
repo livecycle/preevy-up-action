@@ -25,11 +25,11 @@ The profile url created by the CLI, [as detailed in the docs](https://preevy.dev
 
 Optional additional args to the `preevy up` command, see the full reference [here](https://preevy.dev/cli-reference/#preevy-up-service).
 
-### `docker-compose-yaml-path`
+### `docker-compose-yaml-paths`
 
 *required*: `false`
 
-Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory.
+Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory. If you have multiple docker compose files, you can add them as a comma seperated string like so `'docker-compose.yml,docker-compose.dev.yml'`
 
 ## Outputs
 
