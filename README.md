@@ -19,6 +19,12 @@ Use this action to build and deploy a preview environment using the Preevy CLI. 
 
 The profile url created by the CLI, [as detailed in the docs](https://preevy.dev/ci/overview#how-to-run-preevy-from-the-ci).
 
+### `version`
+
+*required*: `false`
+
+The preevy [CLI version](https://www.npmjs.com/package/preevy?activeTab=versions) to use. Defaults to `latest`.
+
 ### `args`
 
 *required*: `false`
