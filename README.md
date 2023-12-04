@@ -17,6 +17,15 @@ More information about running Preevy from CI [over here](https://preevy.dev/ci/
 
 Use [preevy-down action](https://github.com/marketplace/actions/preevy-down) to remove the preview environment when the PR is merged or closed.
 
+## Permissions
+
+Preevy requires the following [GitHub Actions permissions](https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs):
+
+* `contents: read`: used by Preevy to read the Docker Compose file(s)
+* `pull-requests: write`: used by the Preevy GitHub plugin to write a comment with the deployed URLs on the PR
+
+In addition, if you're using GitHub's OIDC Token endpoint to authenticate to your cloud provider (as in the below examples), `id-token: write`: is also needed.
+
 ## Inputs
 
 ### `profile-url`
