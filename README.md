@@ -19,7 +19,7 @@ Use this action to build and deploy a preview environment using the Preevy CLI. 
 
 The profile url created by the CLI, [as detailed in the docs](https://preevy.dev/ci/overview#how-to-run-preevy-from-the-ci).
 
-### `args` 
+### `args`
 
 *required*: `false`
 
@@ -32,10 +32,6 @@ Optional additional args to the `preevy up` command, see the full reference [her
 Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory. If you have multiple docker compose files, you can add them as a comma seperated string like so `'docker-compose.yml,docker-compose.dev.yml'`
 
 ## Outputs
-
-### `urls-markdown`
-
-The generated preview environment urls, formatted in Markdown.
 
 ### `urls-json`
 
@@ -57,6 +53,11 @@ permissions:
   pull-requests: write
 jobs:
   deploy:
+    timeout-minutes: 15
+    concurrency: preevy-${{ github.event.number }}
+    environment:
+      name: preview
+      url: ${{ steps.store_url.outputs.url }}
     runs-on: ubuntu-latest
     steps:
       - uses: aws-actions/configure-aws-credentials@v2
@@ -64,12 +65,18 @@ jobs:
           role-to-assume: arn:aws:iam::12345678:role/my-role
           aws-region: eu-west-1
       - uses: actions/checkout@v3
-      - uses: livecycle/preevy-up-action@latest
+      - uses: livecycle/preevy-up-action@v2.0.0
         id: preevy
         with:
           profile-url: "s3://preevy-12345678-my-profile?region=eu-west-1"
           docker-compose-yaml-paths: "./docker/docker-compose.yaml"
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: ${{ steps.preevy.outputs.urls-markdown }} 
+
+      # Change `frontend` and `3000` in this step to your main service and port
+      # This will appear as the GH environment URL
+      - id: store_url
+        name: Store URL of frontend
+        run: |
+          echo url=$(jq -r '.[] | select(.service=="frontend" and .port==3000).url' "${{ steps.preevy_up.outputs.urls-file }}") >> "$GITHUB_OUTPUT"
+
+
 ```
