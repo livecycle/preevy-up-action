@@ -11,9 +11,9 @@ Visit The full documentation here: https://preevy.dev/
 
 Use this action to build and deploy a preview environment using the Preevy CLI whenever a GitHub PR is created or updated.
 
-Preevy's [GitHub plugin](https://preevy.dev/integrations/github-plugin) will automatically add a comment to your PR with links to the deployed services.
+Preevy's [GitHub plugin](https://preevy.dev/github-plugin) will automatically add a comment to your PR with links to the deployed services.
 
-More information about running Preevy from CI [over here](https://preevy.dev/ci/overview#how-to-run-preevy-from-the-ci).
+More information about running Preevy from CI [over here](https://preevy.dev/ci/).
 
 Use [preevy-down action](https://github.com/marketplace/actions/preevy-down) to remove the preview environment when the PR is merged or closed.
 
@@ -32,7 +32,13 @@ In addition, if you're using GitHub's OIDC Token endpoint to authenticate to you
 
 *required*: `true`
 
-The profile url created by the CLI, [as detailed in the docs](https://preevy.dev/ci/overview#how-to-run-preevy-from-the-ci).
+The profile url created by the CLI, [as detailed in the docs](https://preevy.dev/ci/).
+
+### `args`
+
+*required*: `false`
+
+Optional additional args to the `preevy up` command, see the full reference [here](https://preevy.dev/cli-reference/#preevy-up-service).
 
 ### `version`
 
@@ -40,11 +46,7 @@ The profile url created by the CLI, [as detailed in the docs](https://preevy.dev
 
 The preevy [CLI version](https://www.npmjs.com/package/preevy?activeTab=versions) to use. Defaults to `latest`.
 
-### `args`
-
-*required*: `false`
-
-Optional additional args to the `preevy up` command, see the full reference [here](https://preevy.dev/cli-reference/#preevy-up-service).
+***Note*** Version `v2.1.0` of this action supports Preevy CLI versions `0.0.58` and up. To use an older version of the CLI, use `livecycle/preevy-up-action@v2.0.0`.
 
 ### `docker-compose-yaml-paths`
 
