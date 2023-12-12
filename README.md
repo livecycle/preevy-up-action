@@ -52,6 +52,12 @@ Optional additional args to the `preevy up` command, see the full reference [her
 
 Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory. If you have multiple docker compose files, you can add them as a comma seperated string like so `'docker-compose.yml,docker-compose.dev.yml'`
 
+### `node-cache`
+
+*required*: `false`
+
+Node package manager used for caching. Supported values: npm, yarn, pnpm, or ''. [Details](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data). Default: npm.
+
 ## Outputs
 
 ### `urls-json`
@@ -103,7 +109,7 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: livecycle/preevy-up-action@v2.0.0
+      - uses: livecycle/preevy-up-action@v2.1.0
         id: preevy
         with:
           # Create the profile using the `preevy init` command, see
@@ -181,7 +187,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: livecycle/preevy-up-action@v2.0.0
+      - uses: livecycle/preevy-up-action@v2.1.0
         id: preevy_up
         with:
           # Create the profile using the `preevy init` command, see

@@ -18,6 +18,10 @@ inputs:
     required: false
     description: "Version of Preevy to use. Defaults to latest."
     default: latest
+  node-cache:
+    required: false
+    description: "Node package manager used for caching. Supported values: npm, yarn, pnpm, or ''. See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data"
+    default: npm
 outputs:
   urls-json:
     description: "The generated URLs of the preview environments create by Preevy, formatted as a JSON object"
@@ -31,28 +35,19 @@ runs:
     - uses: actions/setup-node@v4
       with:
         node-version: 18
-        cache: npm
-
-    - name: Install the Preevy CLI
-      shell: bash
-      run: npm i -g preevy@${{ inputs.version }}
-
-    - name: Initialize Preevy
-      shell: bash
-      run: preevy init --from ${{ inputs.profile-url }}
+        cache: ${{ inputs.node-cache }}
 
     - name: Run Preevy
       shell: bash
       id: run_preevy
       run: |
-        file_opt=""
         if [[ ! -z "${{ inputs.docker-compose-yaml-paths }}" ]]; then
-          file_opt="-f ${{ inputs.docker-compose-yaml-paths }}"
+          opts="-f ${{ inputs.docker-compose-yaml-paths }}"
         fi
 
         urls_file=${RUNNER_TEMP}/preevy_urls.${RANDOM}.json
 
-        preevy up ${file_opt} --output-urls-to ${urls_file} ${{ inputs.args }}
+        npx -- preevy@${{ inputs.version }} up ${opts} --profile '${{ inputs.profile-url }}' --output-urls-to ${urls_file} ${{ inputs.args }}
 
         cat ${urls_file}
 
