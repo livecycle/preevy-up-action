@@ -46,7 +46,7 @@ Optional additional args to the `preevy up` command, see the full reference [her
 
 The preevy [CLI version](https://www.npmjs.com/package/preevy?activeTab=versions) to use. Defaults to `latest`.
 
-***Note*** Version `v2.1.0` of this action supports Preevy CLI versions `0.0.58` and up. To use an older version of the CLI, use `livecycle/preevy-up-action@v2.0.0`.
+***Note*** Since `v2.1.0`, this action requires Preevy CLI version `v0.0.58` or newer. To use an older version of the CLI, use `livecycle/preevy-up-action@v2.0.0`.
 
 ### `docker-compose-yaml-paths`
 
@@ -54,11 +54,19 @@ The preevy [CLI version](https://www.npmjs.com/package/preevy?activeTab=versions
 
 Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory. If you have multiple docker compose files, you can add them as a comma seperated string like so `'docker-compose.yml,docker-compose.dev.yml'`
 
+### `release-type`
+
+*required*: `false`
+
+***EXPERIMENTAL***. Specify `gh-release` to install Preevy from a binary file, which is much faster than using NPM.
+
+If this option is specified, `version` can be either `latest` or one of the [released versions](https://github.com/livecycle/preevy/releases). Canary versions are not supported.
+
 ### `node-cache`
 
 *required*: `false`
 
-Node package manager used for caching. Supported values: npm, yarn, pnpm, or ''. [Details](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data). Default: npm.
+Node package manager used for caching. Supported values: `npm`, `yarn`, `pnpm`, or ''. [Details](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data). Default: `npm`.
 
 ## Outputs
 
@@ -111,7 +119,7 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: livecycle/preevy-up-action@v2.1.0
+      - uses: livecycle/preevy-up-action@v2.2.0
         id: preevy
         with:
           # Create the profile using the `preevy init` command, see
@@ -189,7 +197,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: livecycle/preevy-up-action@v2.1.0
+      - uses: livecycle/preevy-up-action@v2.2.0
         id: preevy_up
         with:
           # Create the profile using the `preevy init` command, see
