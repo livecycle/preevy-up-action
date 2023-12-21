@@ -54,13 +54,13 @@ The preevy [CLI version](https://www.npmjs.com/package/preevy?activeTab=versions
 
 Optional path to the `docker-compose.yaml` file. If not provided, uses the working directory. If you have multiple docker compose files, you can add them as a comma seperated string like so `'docker-compose.yml,docker-compose.dev.yml'`
 
-### `release-type`
+### `install`
 
 *required*: `false`
 
-***EXPERIMENTAL***. Specify `gh-release` to install Preevy from a binary file, which is much faster than using NPM.
+***EXPERIMENTAL***. Installation method for the Preevy CLI. Specify `gh-release` to install Preevy from a binary file, which is much faster than using NPM. Specify `none` to skip the installation steps. The default is `npm` which will install from NPM.
 
-If this option is specified, `version` can be either `latest` or one of the [released versions](https://github.com/livecycle/preevy/releases). Canary versions are not supported.
+If `gh-release` is specified, `version` can be either `latest` or one of the [released versions](https://github.com/livecycle/preevy/releases). Canary versions are not supported.
 
 ### `node-cache`
 
@@ -70,9 +70,67 @@ Node package manager used for caching. Supported values: `npm`, `yarn`, `pnpm`, 
 
 ## Outputs
 
+### `urls-map`
+
+The generated preview environment urls, formatted as a JSON map.
+
+Example (formatted for clarity):
+
+```json
+{
+  "backend": {
+    "80": "https://backend-80-my-compose-project-demo-pr-abc1234.livecycle.run/",
+    "9230": "https://backend-9230-my-compose-project-demo-pr-abc1234.livecycle.run/"
+  },
+  "frontend": {
+    "3000": "https://frontend-my-compose-project-demo-pr-abc1234.livecycle.run/"
+  }
+}
+```
+
+The URL for a specific service and port can be expressed in the job as
+
+```
+${{ fromJson(steps.STEP_ID.outputs.urls-map).SERVICE_NAME[PORT] }}
+```
+
+For example:
+
+```
+${{ fromJson(steps.preevy.outputs.urls-map).frontend[3000] }}
+```
+
+See examples below.
+
 ### `urls-json`
 
-The generated preview environment urls, formatted in JSON.
+The generated preview environment URLs, formatted as a JSON array.
+
+Example (formatted for clarity):
+
+```json
+[
+  {
+    "project": "my-compose-project",
+    "service": "frontend",
+    "port": 3000,
+    "url": "https://frontend-my-compose-project-demo-pr-abc1234.livecycle.run/"
+  },
+  {
+    "project": "my-compose-project",
+    "service": "backend",
+    "port": 80,
+    "url": "https://backend-80-my-compose-project-demo-pr-abc1234.livecycle.run/"
+  },
+  {
+    "project": "my-compose-project",
+    "service": "backend",
+    "port": 9230,
+    "url": "https://backend-9230-my-compose-project-demo-pr-abc1234.livecycle.run/"
+  }
+]
+```
+
 
 ## Examples
 
@@ -105,10 +163,10 @@ jobs:
     concurrency: preevy-${{ github.event.number }}
 
     environment:
-      # An environment needs to be created at
-      # https://github.com/YOUR-ORG/YOUR-REPO/settings/environments
+      # An environment needs to be created at https://github.com/YOUR-ORG/YOUR-REPO/settings/environments
       name: preview
-      url: ${{ steps.store_url.outputs.url }}
+      # Change `frontend` and `3000` to the service and port whos URL should be used for the deployment
+      url: ${{ fromJson(steps.preevy.outputs.urls-map).frontend[3000] }}
 
     runs-on: ubuntu-latest
     steps:
@@ -122,17 +180,11 @@ jobs:
       - uses: livecycle/preevy-up-action@v2.2.0
         id: preevy
         with:
-          # Create the profile using the `preevy init` command, see
-          # https://preevy.dev/ci/overview
+          # Create the profile using the `preevy init` command, see https://preevy.dev/ci
           profile-url: "s3://preevy-12345678-my-profile?region=eu-west-1"
+          # Only required if the Compose file(s) are not in the default locations
+          # https://docs.docker.com/compose/reference/#specifying-multiple-compose-files
           docker-compose-yaml-paths: "./docker/docker-compose.yaml"
-
-      # Change `frontend` and `3000` in this step to your main service and port
-      # This will appear as the GH environment URL
-      - id: store_url
-        name: Store URL of frontend
-        run: |
-          echo url=$(jq -r '.[] | select(.service=="frontend" and .port==3000).url' "${{ steps.preevy_up.outputs.urls-file }}") >> "$GITHUB_OUTPUT"
 ```
 
 ### Build on the CI machine with cache, deploy on a Google Cloud VM
@@ -166,8 +218,10 @@ jobs:
     concurrency: preevy-${{ github.event.number }}
 
     environment:
+      # An environment needs to be created at https://github.com/YOUR-ORG/YOUR-REPO/settings/environments
       name: preview
-      url: ${{ steps.store_url.outputs.url }}
+      # Change `frontend` and `3000` to the service and port whos URL should be used for the deployment
+      url: ${{ fromJson(steps.preevy.outputs.urls-map).frontend[3000] }}
 
     env:
       GITHUB_TOKEN: ${{ github.token }}
@@ -200,17 +254,12 @@ jobs:
       - uses: livecycle/preevy-up-action@v2.2.0
         id: preevy_up
         with:
-          # Create the profile using the `preevy init` command, see
-          # https://preevy.dev/ci/overview
+          # Create the profile using the `preevy init` command, see https://preevy.dev/ci
           profile-url: "s3://preevy-12345678-my-profile?region=eu-west-1"
           # Specify the GHCR registry and the builder created above
           args: --registry ghcr.io/livecycle --builder ${{ steps.buildx_setup.outputs.name }}
-
-      # Change `frontend` and `3000` in this step to your main service and port
-      # This will appear as the GH environment URL
-      - id: store_url
-        name: Store URL of frontend
-        run: |
-          echo url=$(jq -r '.[] | select(.service=="frontend" and .port==3000).url' "${{ steps.preevy_up.outputs.urls-file }}") >> "$GITHUB_OUTPUT"
+          # Only required if the Compose file(s) are not in the default locations
+          # https://docs.docker.com/compose/reference/#specifying-multiple-compose-files
+          docker-compose-yaml-paths: "./docker/docker-compose.yaml"
 
 ```
