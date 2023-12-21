@@ -177,7 +177,7 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - uses: livecycle/preevy-up-action@v2.2.0
+      - uses: livecycle/preevy-up-action@v2.3.0
         id: preevy
         with:
           # Create the profile using the `preevy init` command, see https://preevy.dev/ci
@@ -251,7 +251,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: livecycle/preevy-up-action@v2.2.0
+      - uses: livecycle/preevy-up-action@v2.3.0
         id: preevy_up
         with:
           # Create the profile using the `preevy init` command, see https://preevy.dev/ci
