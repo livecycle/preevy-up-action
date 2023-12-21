@@ -22,23 +22,26 @@ inputs:
     required: false
     description: "Node package manager used for caching. Supported values: npm, yarn, pnpm, or ''. See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data"
     default: npm
-  release-type:
+  install:
     required: false
-    description: "EXPERIMENTAL: Type of release to use. Supported values: npm, gh-release"
+    description: "EXPERIMENTAL: Installation method of the Preevy CLI. Supported values: npm, gh-release or none"
     default: npm
 outputs:
+  urls-map:
+    description: "The generated URLs of the preview environments created by Preevy, formatted as a JSON map of <service>.<port>.<url>"
+    value: ${{ steps.run_preevy.outputs.urls-map }}
   urls-json:
-    description: "The generated URLs of the preview environments create by Preevy, formatted as a JSON object"
+    description: "The generated URLs of the preview environments created by Preevy, formatted as a JSON array"
     value: ${{ steps.run_preevy.outputs.urls-json }}
   urls-file:
-    description: "Path to file containing the generated URLs of the preview environments create by Preevy, formatted as a JSON object"
+    description: "Path to file containing the generated URLs of the preview environments create by Preevy, formatted as a JSON array"
     value: ${{ steps.run_preevy.outputs.urls-file }}
 runs:
   using: "composite"
   steps:
     -
       uses: actions/setup-node@v4
-      if: ${{ inputs.release-type == 'npm' }}
+      if: ${{ inputs.install == 'npm' }}
       with:
         node-version: 18
         cache: ${{ inputs.node-cache }}
@@ -46,7 +49,7 @@ runs:
     - name: Install Preevy from GH release
       shell: bash
       id: install_prevy_gh_release
-      if: ${{ inputs.release-type == 'gh-release' }}
+      if: ${{ inputs.install == 'gh-release' }}
       run: |
         set -eou pipefail
 
@@ -87,7 +90,7 @@ runs:
 
         urls_file=${RUNNER_TEMP}/preevy_urls.${RANDOM}.json
 
-        if [[ "${{ inputs.release-type }}" == "npm" ]]; then
+        if [[ "${{ inputs.install }}" == "npm" ]]; then
           preevy_cmd="npx -- preevy@${{ inputs.version }}"
         else
           preevy_cmd=preevy
@@ -95,7 +98,16 @@ runs:
 
         ${preevy_cmd} up ${opts} --profile '${{ inputs.profile-url }}' --output-urls-to ${urls_file} ${{ inputs.args }}
 
+        echo Raw URLs JSON
         cat ${urls_file}
 
         echo "urls-json=$(cat ${urls_file})" >> $GITHUB_OUTPUT
         echo "urls-file=${urls_file}" >> $GITHUB_OUTPUT
+
+        urls_map=$(cat ${urls_file} | jq -c 'group_by(.service) | map({ (.[0].service): (map({ (.port|tostring): .url })) | add }) | add')
+
+        echo ""
+        echo URLs map
+        echo "${urls_map}"
+
+        echo "urls-map=${urls_map}" >> $GITHUB_OUTPUT
