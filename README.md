@@ -68,6 +68,12 @@ If `gh-release` is specified, `version` can be either `latest` or one of the [re
 
 Node package manager used for caching. Supported values: `npm`, `yarn`, `pnpm`, or ''. [Details](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data). Default: `npm`.
 
+### `working-directory`
+
+*required*: `false`
+
+Specifies the working directory where the Preevy CLI is run
+
 ## Outputs
 
 ### `urls-map`

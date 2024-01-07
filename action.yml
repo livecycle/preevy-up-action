@@ -26,6 +26,9 @@ inputs:
     required: false
     description: "EXPERIMENTAL: Installation method of the Preevy CLI. Supported values: npm, gh-release or none"
     default: npm
+  working-directory:
+    required: false
+    description: "Working directory where the preevy CLI will run"
 outputs:
   urls-map:
     description: "The generated URLs of the preview environments created by Preevy, formatted as a JSON map of <service>.<port>.<url>"
@@ -83,6 +86,7 @@ runs:
     - name: Run Preevy
       shell: bash
       id: run_preevy
+      working-directory: ${{ inputs.working-directory }}
       run: |
         if [[ ! -z "${{ inputs.docker-compose-yaml-paths }}" ]]; then
           opts="-f ${{ inputs.docker-compose-yaml-paths }}"
