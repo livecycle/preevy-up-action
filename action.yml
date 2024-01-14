@@ -59,8 +59,8 @@ runs:
         function os_suffix() {
           case "${{ runner.os }}" in
             "Linux") echo -n "linux";;
-            "Windows") echo -n "win";;
-            "macOS") echo -n "macos";;
+            "Windows") echo -n "win32";;
+            "macOS") echo -n "darwin";;
             *) echo "No release for OS ${{ runner.os }}" 1>&2; exit 1;;
           esac
         }
@@ -75,13 +75,14 @@ runs:
 
         release_version='${{ inputs.version }}'
         if [[ "${{ inputs.version }}" == "latest" ]]; then
-          release_version=$(curl -s https://api.github.com/repos/livecycle/preevy/releases/latest | jq -r .tag_name)
+          release_version=$(curl -sfL --retry-connrefused --retry 3 https://api.github.com/repos/livecycle/preevy/releases/latest | jq -r .tag_name)
         fi
 
-        release_file="preevy-$(os_suffix)-$(arch_suffix).tar"
+        release_file="preevy-${release_version}-$(os_suffix)-$(arch_suffix).tar.gz"
         release_url="https://github.com/livecycle/preevy/releases/download/${release_version}/${release_file}"
 
-        wget -q "${release_url}" -O - | sudo tar -x -C /usr/local/bin
+        curl -sfZL --retry-connrefused --retry 3 "${release_url}" | sudo tar -zx -C /usr/local/lib
+        sudo ln -s /usr/local/lib/preevy/bin/preevy /usr/local/bin/preevy
 
     - name: Run Preevy
       shell: bash
