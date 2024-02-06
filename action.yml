@@ -21,7 +21,8 @@ inputs:
   node-cache:
     required: false
     description: "Node package manager used for caching. Supported values: npm, yarn, pnpm, or ''. See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data"
-    default: npm
+    deprecationMessage: "This field is depracated and ignored, Preevy is always used via npx when inputs.install is npm"
+    default: ''
   install:
     required: false
     description: "EXPERIMENTAL: Installation method of the Preevy CLI. Supported values: npm, gh-release or none"
@@ -47,7 +48,7 @@ runs:
       if: ${{ inputs.install == 'npm' }}
       with:
         node-version: 18
-        cache: ${{ inputs.node-cache }}
+        cache: ''
 
     - name: Install Preevy from GH release
       shell: bash
